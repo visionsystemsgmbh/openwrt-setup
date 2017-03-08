@@ -1,0 +1,63 @@
+#!/bin/bash
+BASEDIR=$(pwd)
+
+prepare() {
+	sudo apt update
+	sudo apt install -y mkimage genimage git make
+}
+
+clean() {
+	rm -rf $BASEDIR/openwrt
+}
+
+clone_openwrt(){
+	git clone https://github.com/openwrt/openwrt.git
+	cp $BASEDIR/0001-changes-to-upstream-for-baltos.patch $BASEDIR/openwrt/
+	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
+	cp $BASEDIR/openwrt.config $BASEDIR/openwrt/.config
+	cp $BASEDIR/files $BASEDIR/openwrt/
+	cd $BASEDIR/openwrt
+	git apply 0001-changes-to-upstream-for-baltos.patch
+	scripts/feeds update
+	scripts/feeds install -a
+	scripts/feeds install baltos
+	cd $BASEDIR
+}
+
+build_image(){
+	cd $BASEDIR/openwrt
+	make oldconfig
+	make
+	cd $BASEDIR
+}
+
+create_sdcard(){
+	cd $BASEDIR/openwrt/bin/baltos
+	./mksdcard.sh
+	sudo dd if=sdcard.img of=$1 bs=4M
+	cd $BASEDIR
+}
+
+case $1 in
+
+prepare)
+	prepare
+	;;
+get)
+	clone_openwrt
+	;;
+make)
+	build_image
+	;;
+sdcard)
+	create_sdcard $2
+	;;
+all)
+	prepare
+	clone_openwrt
+	build_image
+	create_sdcard $2
+	;;
+
+esac
+
