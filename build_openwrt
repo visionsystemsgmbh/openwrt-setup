@@ -3,7 +3,15 @@ BASEDIR=$(pwd)
 
 prepare() {
 	sudo apt update
-	sudo apt install -y mkimage genimage git make
+	sudo apt install -y git-core build-essential libssl-dev libncurses5-dev unzip gawk zlib1g-dev
+	sudo apt install -y pkg-config u-boot-tools sudo python2.7 subversion wget dosfstools libconfuse-dev
+	wget http://public.pengutronix.de/software/genimage/genimage-9.tar.xz
+	tar xfvJ genimage-9.tar.xz
+	cd $BASEDIR/genimage-9/
+	./configure 
+	make
+	sudo make install
+	cd $BASEDIR
 }
 
 clean() {
@@ -14,7 +22,6 @@ clone_openwrt(){
 	git clone https://github.com/openwrt/openwrt.git
 	cp $BASEDIR/0001-changes-to-upstream-for-baltos.patch $BASEDIR/openwrt/
 	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
-	cp $BASEDIR/openwrt.config $BASEDIR/openwrt/.config
 	cp $BASEDIR/files $BASEDIR/openwrt/
 	cd $BASEDIR/openwrt
 	git apply 0001-changes-to-upstream-for-baltos.patch
@@ -25,16 +32,17 @@ clone_openwrt(){
 }
 
 build_image(){
+	cp $BASEDIR/openwrt.config $BASEDIR/openwrt/.config
 	cd $BASEDIR/openwrt
-	make oldconfig
+	make defconfig
 	make
 	cd $BASEDIR
 }
 
 create_sdcard(){
 	cd $BASEDIR/openwrt/bin/baltos
+	PATH=$PATH:/sbin/
 	./mksdcard.sh
-	sudo dd if=sdcard.img of=$1 bs=4M
 	cd $BASEDIR
 }
 
@@ -50,13 +58,16 @@ make)
 	build_image
 	;;
 sdcard)
-	create_sdcard $2
+	create_sdcard
 	;;
 all)
 	prepare
 	clone_openwrt
 	build_image
 	create_sdcard $2
+	;;
+clean)
+	clean
 	;;
 
 esac
