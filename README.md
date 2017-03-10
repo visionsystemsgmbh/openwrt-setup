@@ -9,9 +9,13 @@ Installation
 2. `cd openwrt-setup` 
 
 Use the `build_openwrt` tool to start quickly:
+
 1. `./build_openwrt prepare` - gets all packages necessary to use the OpenWrt Build System (only functional on a current Debian-based system) 
+
 2. `./build_openwrt get` - gets the OpenWrt Build System itself and adjusts it for use with Baltos devices. 
+
 3. `./build_openwrt make` - builds the basic OpenWrt for Baltos. This will take some time (~2h).
+
 4. `./build_openwrt sdcard` - creates a SD-Card image that can run on any Baltos system.
 
 5. `./build_openwrt all` - runs all the step above.
