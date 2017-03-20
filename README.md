@@ -5,14 +5,24 @@ OpenWrt Build System Quick-Start for Baltos
 Installation
 ------------
 
+Prior to beginning with a build process make sure you have following packages installed:
+
+git, libssl-dev, libncurses5-dev, unzip, gawk, zlib1g-dev, pkg-config, u-boot-tools, python2.7, subversion, wget, dosfstools, libconfuse-dev
+
+On a Debian-like system you can invoke following command to get all needed packages installed:
+
+    sudo update
+    sudo apt install -y git-core build-essential libssl-dev libncurses5-dev unzip gawk zlib1g-dev
+    sudo apt install -y pkg-config u-boot-tools python2.7 subversion wget dosfstools libconfuse-dev
+
 1. `git clone https://github.com/visionsystemsgmbh/openwrt-setup.git`
 2. `cd openwrt-setup` 
 
 Use the `build_openwrt` tool to start quickly:
 
-1. `./build_openwrt prepare` - gets all packages necessary to use the OpenWrt Build System (only functional on a current Debian-based system) 
+1. `./build_openwrt prepare` - gets all packages necessary to use the OpenWrt Build System.
 
-2. `./build_openwrt get` - gets the OpenWrt Build System itself and adjusts it for use with Baltos devices. 
+2. `./build_openwrt get` - gets the OpenWrt Build System itself and adjusts it for use with Baltos devices.
 
 3. `./build_openwrt make` - builds the basic OpenWrt for Baltos. This will take some time (~2h).
 

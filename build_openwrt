@@ -2,23 +2,23 @@
 BASEDIR=$(pwd)
 
 prepare() {
-	sudo apt update
-	sudo apt install -y git-core build-essential libssl-dev libncurses5-dev unzip gawk zlib1g-dev
-	sudo apt install -y pkg-config u-boot-tools sudo python2.7 subversion wget dosfstools libconfuse-dev
+	echo Preparing build environment
+	rm -f genimage-9.tar.xz
 	wget http://public.pengutronix.de/software/genimage/genimage-9.tar.xz
 	tar xfvJ genimage-9.tar.xz
 	cd $BASEDIR/genimage-9/
 	./configure 
 	make
-	sudo make install
 	cd $BASEDIR
 }
 
 clean() {
+	echo Removing OpenWrt folder
 	rm -rf $BASEDIR/openwrt
 }
 
 clone_openwrt(){
+	echo Cloning OpenWrt repository
 	git clone https://github.com/openwrt/openwrt.git
 	cp $BASEDIR/0001-changes-to-upstream-for-baltos.patch $BASEDIR/openwrt/
 	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
@@ -32,6 +32,7 @@ clone_openwrt(){
 }
 
 build_image(){
+	echo Building OpenWrt
 	cp $BASEDIR/openwrt.config $BASEDIR/openwrt/.config
 	cd $BASEDIR/openwrt
 	make defconfig
@@ -40,8 +41,9 @@ build_image(){
 }
 
 create_sdcard(){
+	echo Creating SD card image
 	cd $BASEDIR/openwrt/bin/baltos
-	PATH=$PATH:/sbin/
+	PATH=$PATH:$BASEDIR/genimage-9
 	./mksdcard.sh
 	cd $BASEDIR
 }
