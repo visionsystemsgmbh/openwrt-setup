@@ -20,11 +20,10 @@ clean() {
 clone_openwrt(){
 	echo Cloning OpenWrt repository
 	git clone https://github.com/openwrt/openwrt.git
-	cp $BASEDIR/0001-changes-to-upstream-for-baltos.patch $BASEDIR/openwrt/
 	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
 	cp $BASEDIR/files $BASEDIR/openwrt/
 	cd $BASEDIR/openwrt
-	git apply 0001-changes-to-upstream-for-baltos.patch
+	git am $BASEDIR/0001-changes-to-upstream-for-baltos.patch
 	scripts/feeds update
 	scripts/feeds install -a
 	scripts/feeds install baltos
