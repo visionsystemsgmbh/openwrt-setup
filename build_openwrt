@@ -65,7 +65,7 @@ all)
 	prepare
 	clone_openwrt
 	build_image
-	create_sdcard $2
+	create_sdcard
 	;;
 clean)
 	clean
