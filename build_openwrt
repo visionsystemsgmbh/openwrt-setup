@@ -47,6 +47,19 @@ create_sdcard(){
 	cd $BASEDIR
 }
 
+print_help(){
+	echo build_openwrt usage:
+	echo
+	echo "./build_openwrt [prepare|get|make|sdcard|all|clean]"
+	echo
+	echo "  prepare  download and build genimage utility"
+	echo "  get      clone OpenWrt repo and apply custom patches"
+	echo "  make     build OpenWrt"
+	echo "  sdcard   build OpenWrt SD card image"
+	echo "  all      perform all above commands one after another"
+	echo "  clean    remove openwrt folder"
+}
+
 case $1 in
 
 prepare)
@@ -70,6 +83,8 @@ all)
 clean)
 	clean
 	;;
-
+*)
+	print_help
+	;;
 esac
 
