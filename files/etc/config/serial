@@ -1,0 +1,9 @@
+
+config iface 'COM1'
+	option dev '/dev/ttyO1'
+	option mode 'rs232'
+	option databit 'cs8'
+	option parity '-parenb'
+	option stopbit '-cstopb'
+	option flowtype '-ixon crtscts'
+	option baudrate '57600'

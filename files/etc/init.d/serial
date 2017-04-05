@@ -1,0 +1,56 @@
+#!/bin/sh /etc/rc.common
+
+START=15
+SERVICE_DAEMONIZE=1
+SERVICE_WRITE_PID=
+
+handle_iface() {
+        local config="$1"
+        local dev
+        local port
+        local timeout
+        local options
+        local baudrate
+        local databit
+        local stopbit
+        local parity
+        local flowtype
+	local mode
+	local devtype
+        config_get dev "$config" dev
+        config_get tcpport "$config" tcpport
+        config_get telprot "$config" telprot
+        config_get timeout "$config" timeout
+        config_get baudrate "$config" baudrate
+        config_get databit "$config" databit
+        config_get stopbit "$config" stopbit
+        config_get parity "$config" parity
+        config_get flowtype "$config" flowtype
+        config_get mode "$config" mode
+        config_get devtype "$config" devtype
+	stty -F $dev $baudrate $databit $parity $stopbit $flowtype
+
+	if [ "$devtype" = "internal" ]; then
+		if onrisctool -j | grep "Port ${config#COM}" | grep 0011 ; then
+			onrisctool -p ${config#COM} -t $mode
+		fi
+		if onrisctool -S | grep "Vector:" | grep 0011 ; then
+			onrisctool -p ${config#COM} -t $mode
+		fi
+	fi
+}
+
+start() {
+        config_load '/etc/config/serial'
+        echo 'serial loaded'
+        config_foreach handle_iface iface
+}
+
+stop() {
+        echo 'serial stop'
+}
+
+restart() {
+	stop
+	start
+}

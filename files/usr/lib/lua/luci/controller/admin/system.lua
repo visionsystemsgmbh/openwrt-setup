@@ -35,6 +35,7 @@ function index()
 	entry({"admin", "system", "flashops", "reset"}, post("action_reset"))
 	entry({"admin", "system", "flashops", "backup"}, post("action_backup"))
 	entry({"admin", "system", "flashops", "backupfiles"}, form("admin_system/backupfiles"))
+	entry({"admin", "system", "flashops", "burn"}, post("action_burn"))
 
 	-- call() instead of post() due to upload handling!
 	entry({"admin", "system", "flashops", "restore"}, call("action_restore"))
@@ -194,8 +195,12 @@ local function supports_sysupgrade()
 	return nixio.fs.access("/lib/upgrade/platform.sh")
 end
 
+local function supports_sdcard()
+	return nixio.fs.stat("/dev/mmcblk0p1")
+end
+
 local function supports_reset()
-	return (os.execute([[grep -sqEi '"rootfs_data"|"ubi"' /proc/mtd]]) == 0)
+	return (os.execute([[grep -sqE '"rootfs_data"|"ubi"' /proc/mtd]]) == 0)
 end
 
 local function storage_size()
@@ -227,7 +232,8 @@ function action_flashops()
 	--
 	luci.template.render("admin_system/flashops", {
 		reset_avail   = supports_reset(),
-		upgrade_avail = supports_sysupgrade()
+		upgrade_avail = supports_sysupgrade(),
+		sdcard_avail = supports_sdcard()
 	})
 end
 
@@ -359,6 +365,15 @@ function action_reset()
 
 		fork_exec("sleep 1; killall dropbear uhttpd; sleep 1; jffs2reset -y && reboot")
 		return
+	end
+
+	http.redirect(luci.dispatcher.build_url('admin/system/flashops'))
+end
+
+function action_burn()
+	local http = require "luci.http"
+	if supports_sdcard() then
+		fork_exec("sleep 1; burn.sh")
 	end
 
 	http.redirect(luci.dispatcher.build_url('admin/system/flashops'))
