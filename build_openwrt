@@ -19,7 +19,7 @@ clean() {
 
 clone_openwrt(){
 	echo Cloning OpenWrt repository
-	git clone https://github.com/openwrt/openwrt.git
+	git clone https://github.com/openwrt/archive.git openwrt
 	cd $BASEDIR/openwrt
 	git checkout 871372c42a3fc9c4b33f5c6011742d610a2e5600
 	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
