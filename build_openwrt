@@ -19,14 +19,12 @@ clean() {
 
 clone_openwrt(){
 	echo Cloning OpenWrt repository
-	git clone https://github.com/openwrt/archive.git openwrt
+	git clone https://github.com/openwrt/openwrt.git
 	cd $BASEDIR/openwrt
-	git checkout 871372c42a3fc9c4b33f5c6011742d610a2e5600
 	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
 	cp -r $BASEDIR/files $BASEDIR/openwrt/
 	git config user.email "contact@visionsystems.de"
 	git config user.name "Vision Systems GmbH"
-	git am $BASEDIR/patches/*
 	scripts/feeds update
 	scripts/feeds install -a
 	scripts/feeds install baltos
@@ -44,7 +42,7 @@ build_image(){
 
 create_sdcard(){
 	echo Creating SD card image
-	cd $BASEDIR/openwrt/bin/baltos
+	cd $BASEDIR/openwrt/bin/targets/baltos/generic
 	PATH=$PATH:$BASEDIR/genimage-9
 	./mksdcard.sh
 	cd $BASEDIR
