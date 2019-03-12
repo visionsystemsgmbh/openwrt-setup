@@ -1,0 +1,5 @@
+#!/bin/sh
+ln -s /dev/ttyO0 /dev/vscon
+ln -s /dev/ttyO1 /dev/ttyVS0
+ln -s /dev/ttyO2 /dev/ttyVS1
+
