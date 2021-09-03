@@ -1,53 +1,59 @@
 #!/bin/bash
 BASEDIR=$(pwd)
+GENIMAGE_VERSION=9
 
 prepare() {
 	echo Preparing build environment
-	rm -f genimage-9.tar.xz
-	wget http://public.pengutronix.de/software/genimage/genimage-9.tar.xz
-	tar xfvJ genimage-9.tar.xz
-	cd $BASEDIR/genimage-9/
+	rm -f genimage-$GENIMAGE_VERSION.tar.xz
+	wget http://public.pengutronix.de/software/genimage/genimage-$GENIMAGE_VERSION.tar.xz
+	tar xfvJ genimage-$GENIMAGE_VERSION.tar.xz
+	cd "$BASEDIR/genimage-$GENIMAGE_VERSION/"
 	./configure 
 	make
-	cd $BASEDIR
+	cd "$BASEDIR"
 }
 
 clean() {
 	echo Removing OpenWrt folder
-	rm -rf $BASEDIR/openwrt
+	rm -rf "$BASEDIR/openwrt"
 }
 
 clone_openwrt(){
 	echo Cloning OpenWrt repository
-	git clone https://github.com/openwrt/openwrt.git
+	git clone https://github.com/openwrt/openwrt.git openwrt
 	cd $BASEDIR/openwrt
-	git checkout v18.06.2
-	cp $BASEDIR/feeds.conf $BASEDIR/openwrt/
-	cp -r $BASEDIR/files $BASEDIR/openwrt/
+	#git checkout 871372c42a3fc9c4b33f5c6011742d610a2e5600
+	cp "$BASEDIR/feeds.conf" "$BASEDIR/openwrt/"
+	cp -r "$BASEDIR/files" "$BASEDIR/openwrt/"
 	#git config user.email "contact@visionsystems.de"
 	#git config user.name "Vision Systems GmbH"
 	#git am $BASEDIR/patches/*
+	#rc=$?
+	#if [[ $rc != 0 ]] ; then
+	#	echo Failed to apply patches
+	#	exit 1
+	#fi
 	scripts/feeds update
 	scripts/feeds install -a
-	scripts/feeds install baltos
-	cd $BASEDIR
+	scripts/feeds install -p onrisc_target baltos
+	cd "$BASEDIR"
 }
 
 build_image(){
 	echo Building OpenWrt
-	cp $BASEDIR/openwrt.config $BASEDIR/openwrt/.config
-	cd $BASEDIR/openwrt
+	cp "$BASEDIR/openwrt.config" "$BASEDIR/openwrt/.config"
+	cd "$BASEDIR/openwrt"
 	make defconfig
 	make
-	cd $BASEDIR
+	cd "$BASEDIR"
 }
 
 create_sdcard(){
 	echo Creating SD card image
-	cd $BASEDIR/openwrt/bin/targets/baltos/generic
-	PATH=$PATH:$BASEDIR/genimage-9:/sbin
+	cd "$BASEDIR/openwrt/bin/targets/baltos/generic"
+	PATH=$PATH:"$BASEDIR/genimage-$GENIMAGE_VERSION":/sbin
 	./mksdcard.sh
-	cd $BASEDIR
+	cd "$BASEDIR"
 }
 
 print_help(){
